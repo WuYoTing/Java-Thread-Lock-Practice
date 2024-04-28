@@ -22,7 +22,7 @@ public class LocalLockBaseOnReentrantLockDemo {
     /**
      * Lock The Tread By Process, if not exist lock , if not display error
      */
-    public static void testThread(String key) {
+    public static void lock(String key) {
         // ReentrantLock have constructor can generate FairSync or NonfairSync
         ReentrantLock lock = locks.computeIfAbsent(key, k -> new ReentrantLock(true));
 
@@ -31,7 +31,7 @@ public class LocalLockBaseOnReentrantLockDemo {
                 log.info("Thread: {} , acquired the lock for key: {}", Thread.currentThread().getName(), key);
 
                 // Simulate work for a period
-                Thread.sleep(5000);
+                Thread.sleep(2000);
 
             } catch (Exception e) {
                 // re interrupt thread process
@@ -55,7 +55,7 @@ public class LocalLockBaseOnReentrantLockDemo {
 
             Thread thread = new Thread(() -> {
                 log.info("Process Thread: {}, key: {}", Thread.currentThread().getName(), key);
-                testThread(key);
+                lock(key);
             });
             thread.start();
         });
