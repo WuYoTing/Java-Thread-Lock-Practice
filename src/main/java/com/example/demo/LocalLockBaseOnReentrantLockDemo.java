@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -8,14 +8,23 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * [Local Lock] This is an example of using {@link ReentrantLock} To Lock the tread process
+ * Pros : Simple to use
+ * Cron : Can't cross different service
+ */
 @Log4j2
 @AllArgsConstructor
-public class DemoService {
+public class LocalLockBaseOnReentrantLockDemo {
 
     private static final Map<String, ReentrantLock> locks = new ConcurrentHashMap<>();
 
+    /**
+     * Lock The Tread By Process, if not exist lock , if not display error
+     */
     public static void testThread(String key) {
-        ReentrantLock lock = locks.computeIfAbsent(key, k -> new ReentrantLock());
+        // ReentrantLock have constructor can generate FairSync or NonfairSync
+        ReentrantLock lock = locks.computeIfAbsent(key, k -> new ReentrantLock(true));
 
         if (lock.tryLock()) {
             try {
@@ -25,6 +34,8 @@ public class DemoService {
                 Thread.sleep(5000);
 
             } catch (Exception e) {
+                // re interrupt thread process
+                Thread.currentThread().interrupt();
                 log.error("Thread: {}, interrupted: {}", Thread.currentThread().getName(), e.getMessage());
             } finally {
                 // Prevent deadlock
@@ -40,10 +51,13 @@ public class DemoService {
         // Create multiple threads to concurrently execute lock acquisition and release operations
         List<String> keyList = List.of("A", "B", "C", "D", "E", "F", "G", "H", "I", "A");
 
-        for (int index = 0; index < keyList.size(); index++) {
-            int finalIndex = index;
-            Thread thread = new Thread(() -> testThread(keyList.get(finalIndex)));
+        keyList.parallelStream().forEach(key -> {
+
+            Thread thread = new Thread(() -> {
+                log.info("Process Thread: {}, key: {}", Thread.currentThread().getName(), key);
+                testThread(key);
+            });
             thread.start();
-        }
+        });
     }
 }
