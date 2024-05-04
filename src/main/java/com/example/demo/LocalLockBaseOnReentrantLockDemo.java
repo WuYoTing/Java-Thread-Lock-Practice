@@ -11,7 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * [Local Lock] This is an example of using {@link ReentrantLock} To Lock the tread process
  * Pros : Simple to use
- * Cron : Can't cross different service
+ * Cron : Can't cross different service or pod
  */
 @Log4j2
 @AllArgsConstructor

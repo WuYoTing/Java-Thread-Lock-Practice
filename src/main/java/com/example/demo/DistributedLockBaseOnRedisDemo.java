@@ -11,8 +11,11 @@ import java.util.List;
 
 /**
  * [Distributed Lock] This is an example of using Redis To Lock the tread process
- * Pros : cross different service
- * Cron : Need to measure more situation
+ * Pros :
+ * 1. cross different service or pod
+ * Cron :
+ * 1. Need to measure more situation (e.g. when service is down , ur unlock may be unreachable ,so we need to set timer on redis key)
+ * 2. Redis is a remote server, so once we lose connection with Redis, our local thread in the wait queue is blocked forever!
  */
 @Log4j2
 @AllArgsConstructor
